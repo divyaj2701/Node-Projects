@@ -5,7 +5,7 @@ const connectDB = require('./db/connect')
 require('dotenv').config()
 
 // middleware
-
+app.use(express.static('./public'))
 app.use(express.json())     // if we dont use this then we wont have data is req.body 
 
 // routes
