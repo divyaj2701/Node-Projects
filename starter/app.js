@@ -5,13 +5,10 @@ const connectDB = require('./db/connect')
 require('dotenv').config()
 
 // middleware
+
 app.use(express.json())     // if we dont use this then we wont have data is req.body 
 
 // routes
-app.get('/hello', (req, res) => {
-    res.status(200).send("Hello!! welcome to first Node project..")
-})
-
 app.use('/api/v1/tasks', tasks)
 
 // app.get('/api/v1/tasks')        - get all the tasks
