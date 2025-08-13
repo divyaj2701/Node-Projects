@@ -3,6 +3,7 @@ const app = express();
 const tasks = require('./routes/tasks')
 const connectDB = require('./db/connect')
 require('dotenv').config()
+const notFound = require('./middleware/not-found')
 
 // middleware
 app.use(express.static('./public'))
@@ -10,6 +11,8 @@ app.use(express.json())     // if we dont use this then we wont have data is req
 
 // routes
 app.use('/api/v1/tasks', tasks)
+
+app.use(notFound)
 
 // app.get('/api/v1/tasks')        - get all the tasks
 // app.post('/api/v1/tasks')       - create a new task
