@@ -1,11 +1,14 @@
 require('dotenv').config();
-// async errors
-
+require('express-async-errors')     // async errors
+ 
 
 const express = require('express');
 const app = express();
 
 const connectDB = require('./db/connect')
+const productRouter = require('./routes/products')
+
+
 const notFoundMiddleware = require('./middleware/not-found')
 const errorMiddleware = require('./middleware/error-handler')
 
@@ -13,10 +16,12 @@ const errorMiddleware = require('./middleware/error-handler')
 // automatically parse incoming requests with JSON payloads and make the parsed data available in req.body
 app.use(express.json())                 // enables json parsing
 
-// routes
+// routes   - testing
 app.get('/', (req ,res) => {
     res.send('<h1>Store API</h1><a href="api/v1/products">Products route</a>')
 })
+
+app.use('/api/v1/products',productRouter)
 
 // product routes
 
