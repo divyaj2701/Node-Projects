@@ -29,19 +29,19 @@ const Product = require('../models/product')
 // } 
 
 
-// sort
+// sort and select
 
 const getAllProductsStatic = async (req, res) => {
     
     // const products = await Product.find({}).sort('name')             // alphabetical order
     // const products = await Product.find({}).sort('-name')            // reverse alphabetical order
-    const products = await Product.find({}).sort('-name price')         // reverse alphabetical then price
+    const products = await Product.find({}).sort('-name price').select('name price company')         // reverse alphabetical then price
     res.status(200).json({msg:products, nbHits: products.length})
 }
 
 const getAllProducts= async (req, res) => {
 
-    const {featured, company, name, sort} = req.query
+    const {featured, company, name, sort, fields} = req.query
     const queryObject = {}                          
 
     if(featured) queryObject.featured = featured === 'true'? true:false;
@@ -53,6 +53,7 @@ const getAllProducts= async (req, res) => {
     // let products = await Product.find(queryObject)    // retrieves all the matching document unsorted, 
                                                         // if .sort() => sorting will happen in memory => slow, more RAM
                                                         // data is loaded in Node.js
+    // sort
     if(sort){
         const sortList = sort.split(',').join(' ')
         result = result.sort(sortList)                  // MongoDB will perform sorting on server before sending results
@@ -61,9 +62,18 @@ const getAllProducts= async (req, res) => {
     else{
         result = result.sort('createdAt')           // default sort if no sort is provided (optional)
     }
+
+    // select
+    if(fields){
+        const fieldsList = fields.split(',').join(' ')
+        result = result.select(fieldsList)
+    }
+    
     const products = await result                   // gets the sorted document
     res.status(200).json({msg:products, nbHits: products.length})
 } 
+
+
 
 module.exports = {
     getAllProductsStatic,
