@@ -4,7 +4,7 @@
 
 // setup authentication so only the request with JWT can access the dashboard
 
-
+const jwt = require('jsonwebtoken')
 const CustomAPIError = require('../errors/custom-error')
 
 const login = async (req, res) => {
@@ -15,12 +15,18 @@ const login = async (req, res) => {
     // Joi - set up entire additonal layer of validation, using another package i.e. Joi
     // check in the controller
 
-
     if(!username || !password){
         throw new CustomAPIError('Please Provide email and password', 400)     // 400 -> Bad request
     }
 
-    res.send('Fake Login/Register/SignUp Route')
+    // just for the demo, normally provided by DB!!
+    const id = new Date().getDate()
+
+    // try to keep payload small, better experience for user
+    // bigger the payload the more data you are sending over the wire
+    const token = jwt.sign({id, username}, process.env.JWT_SECRET,{expiresIn:'30d'})    // payload, jwt secret, options
+
+    res.status(200).json({msg:'user created', token})
 }
 
 const dashboard = async (req ,res) => {
