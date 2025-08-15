@@ -29,25 +29,52 @@ const Product = require('../models/product')
 // } 
 
 
-// sort, select, skip and limit
+// sort, select, skip and limit, numeric filter
 
 const getAllProductsStatic = async (req, res) => {
     
     // const products = await Product.find({}).sort('name')             // alphabetical order
     // const products = await Product.find({}).sort('-name')            // reverse alphabetical order
-    const products = await Product.find({}).sort('-name price').select('name price company').limit(6).skip(5)      
+    const products = await Product.find({price:{$gt:30}}).sort('-name price').select('name price company').limit(18).skip(1)      
                                                 // reverse alphabetical then price
     res.status(200).json({msg:products, nbHits: products.length})
 } 
 
 const getAllProducts= async (req, res) => {
 
-    const {featured, company, name, sort, fields} = req.query
+    const {featured, company, name, sort, fields, numericFilters} = req.query
     const queryObject = {}                          
 
     if(featured) queryObject.featured = featured === 'true'? true:false;
     if(company) queryObject.company = company;
     if(name) queryObject.name = {$regex : name, $options: 'i'};
+    // numeric Filter
+    if(numericFilters){
+        console.log(queryObject)
+        console.log(numericFilters)
+        const operatorMap = {
+            '>':'$gt',
+            '>=':'$gte',
+            '<':'$lt',
+            '<=':'$lte',
+            '=':'$eq',
+        }
+        const regEx = /\b(<|>|>=|=|<|<=)\b/g           // regular expression
+        let filters = numericFilters.replace(
+            regEx,
+            (match) => `-${operatorMap[match]}-`
+        )
+        console.log(filters)
+        const options = ['price','rating']
+        filters = filters.split(',').forEach((item) => {
+            const [field, operator, value] = item.split('-')
+            if(options.includes(field)){
+                queryObject[field] = { [operator] : Number(value)}
+            }
+        })
+        console.log(queryObject)
+
+    }
     // console.log(queryObject);
     
     let result = Product.find(queryObject)               // returns a mongoose query object
