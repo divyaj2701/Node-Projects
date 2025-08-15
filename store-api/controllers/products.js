@@ -29,15 +29,16 @@ const Product = require('../models/product')
 // } 
 
 
-// sort and select
+// sort, select, skip and limit
 
 const getAllProductsStatic = async (req, res) => {
     
     // const products = await Product.find({}).sort('name')             // alphabetical order
     // const products = await Product.find({}).sort('-name')            // reverse alphabetical order
-    const products = await Product.find({}).sort('-name price').select('name price company')         // reverse alphabetical then price
+    const products = await Product.find({}).sort('-name price').select('name price company').limit(6).skip(5)      
+                                                // reverse alphabetical then price
     res.status(200).json({msg:products, nbHits: products.length})
-}
+} 
 
 const getAllProducts= async (req, res) => {
 
@@ -68,7 +69,13 @@ const getAllProducts= async (req, res) => {
         const fieldsList = fields.split(',').join(' ')
         result = result.select(fieldsList)
     }
-    
+
+    // pagination functionlity - skip and limit
+    const page = Number(req.query.page) || 1            // 1 -> default page number
+    const limit = Number(req.query.limit) || 10         // 10 -> defualt limit (can e anything depends on developer)
+    const skip = (page-1)*limit;
+    result = result.skip(skip).limit(limit)
+
     const products = await result                   // gets the sorted document
     res.status(200).json({msg:products, nbHits: products.length})
 } 
