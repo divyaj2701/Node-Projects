@@ -4,6 +4,7 @@ require('express-async-errors')
 const express = require('express')
 const app = express()
 
+const mainRouter = require('./routes/main')
 const notFoundMiddleware = require('./middleware/not-found')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 
@@ -12,6 +13,7 @@ const errorHandlerMiddleware = require('./middleware/error-handler')
 app.use(express.static('./public'))          // index.html, .css etc. files
 app.use(express.json())                     // there is post route => to access req.body
 
+app.use('/api/v1', mainRouter)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)
